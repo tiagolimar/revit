@@ -1,0 +1,156 @@
+{
+  "Uuid": "7c74dd19-9a38-4f91-a494-3ac7eab828f8",
+  "IsCustomNode": false,
+  "Description": "",
+  "Name": "Home",
+  "ElementResolver": {
+    "ResolutionMap": {}
+  },
+  "Inputs": [],
+  "Outputs": [
+    {
+      "Id": "60bd46e3f919466c9129bbf423ce2bbb",
+      "Name": "Python Script",
+      "Type": "unknown",
+      "InitialValue": "",
+      "Description": "Executa um script Python incorporado."
+    }
+  ],
+  "Nodes": [
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "NodeType": "PythonScriptNode",
+      "Code": "import csv\r\nimport clr\r\nclr.AddReference('RevitAPI')\r\nfrom Autodesk.Revit.DB import *\r\n\r\n# Substitua 'Caminho/Para/Seu/Arquivo.csv' pelo caminho do seu arquivo CSV\r\ncsvFilePath = r'C:\\\\Users\\\\FD PROJETOS2\\\\Desktop\\\\_\\\\tiago_lima\\\\revit\\\\file.csv'\r\n\r\n# Substitua 'NomeDaFamília' e 'TipoDaFamília' pelos valores apropriados para a sua família de detalhe\r\nfamilyName = 'Painel'\r\ntypeName = 'Painel'\r\n\r\n# Função para encontrar uma família e tipo no documento atual\r\ndef find_family_and_type(doc, family_name, type_name):\r\n    fam_symbol = None\r\n    for fam in FilteredElementCollector(doc).OfClass(Family):\r\n        if fam.Name == family_name:\r\n            for symbolId in fam.GetFamilySymbolIds():\r\n                symbol = doc.GetElement(symbolId)\r\n                if symbol.Name == type_name:\r\n                    fam_symbol = symbol\r\n                    break\r\n    return fam_symbol\r\n\r\n# Função para criar instâncias de família\r\ndef create_family_instances(doc, fam_symbol, locations):\r\n    with Transaction(doc, 'Create Family Instances') as trans:\r\n        trans.Start()\r\n        if not fam_symbol.IsActive:\r\n            fam_symbol.Activate()\r\n            doc.Regenerate()\r\n        for loc in locations:\r\n            doc.Create.NewFamilyInstance(XYZ(loc[0], loc[1], 0), fam_symbol, doc.ActiveView)\r\n        trans.Commit()\r\n\r\n# Lendo o arquivo CSV e armazenando as posições das instâncias\r\nlocations = []\r\nx_offset = 0\r\nwith open(csvFilePath, mode='r') as file:\r\n    reader = csv.DictReader(file, delimiter=';')\r\n    for row in reader:\r\n        try:\r\n            comprimento = float(row['Comprimento'].replace(',', '.'))\r\n            largura = float(row['Largura'].replace(',', '.'))\r\n            espessura = float(row['Espessura'].replace(',', '.'))\r\n            quantidade = int(row['Quantidade'])\r\n            \r\n            # Calculando o deslocamento para cada instância\r\n            for _ in range(quantidade):\r\n                locations.append((x_offset, 0))\r\n                x_offset += comprimento / 304.8  # Convertendo para pés\r\n        except:\r\n            OUT = row\r\n\r\n# Encontrar a família e tipo no documento\r\ndoc = __revit__.ActiveUIDocument.Document\r\nfam_symbol = find_family_and_type(doc, familyName, typeName)\r\n\r\n# Criar instâncias da família na vista ativa\r\nif fam_symbol:\r\n    create_family_instances(doc, fam_symbol, locations)\r\nelse:\r\n    TaskDialog.Show('Erro', 'Família ou tipo não encontrado.')\r\n",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "60bd46e3f919466c9129bbf423ce2bbb",
+      "Inputs": [
+        {
+          "Id": "0119e15560154a73b2250e1528e3dbbb",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "728a19a052b3420eb3879182e60c71a6",
+          "Name": "OUT",
+          "Description": "Resultado do script Python",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Executa um script Python incorporado."
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.ZeroTouch.DSFunction, DynamoCore",
+      "NodeType": "FunctionNode",
+      "FunctionSignature": "Revit.Application.Document.Current",
+      "Id": "840901127caf4b6bbef1dced534a6128",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "4eea16f98b734464b86825d1ee902af8",
+          "Name": "Document",
+          "Description": "Document",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Auto",
+      "Description": "Obter o documento atual\n\nDocument.Current: Document"
+    }
+  ],
+  "Connectors": [
+    {
+      "Start": "4eea16f98b734464b86825d1ee902af8",
+      "End": "0119e15560154a73b2250e1528e3dbbb",
+      "Id": "79ae40c70e9a44d68906a52b82184395",
+      "IsHidden": "False"
+    }
+  ],
+  "Dependencies": [],
+  "NodeLibraryDependencies": [],
+  "Thumbnail": "",
+  "GraphDocumentationURL": null,
+  "ExtensionWorkspaceData": [
+    {
+      "ExtensionGuid": "28992e1d-abb9-417f-8b1b-05e053bee670",
+      "Name": "Properties",
+      "Version": "2.13",
+      "Data": {}
+    },
+    {
+      "ExtensionGuid": "DFBD9CC0-DB40-457A-939E-8C8555555A9D",
+      "Name": "Generative Design",
+      "Version": "2.0",
+      "Data": {}
+    }
+  ],
+  "Author": "",
+  "Linting": {
+    "activeLinter": "Nenhum",
+    "activeLinterId": "7b75fb44-43fd-4631-a878-29f4d5d8399a",
+    "warningCount": 0,
+    "errorCount": 0
+  },
+  "Bindings": [],
+  "View": {
+    "Dynamo": {
+      "ScaleFactor": 1.0,
+      "HasRunWithoutCrash": true,
+      "IsVisibleInDynamoLibrary": true,
+      "Version": "2.13.1.3887",
+      "RunType": "Manual",
+      "RunPeriod": "1000"
+    },
+    "Camera": {
+      "Name": "Visualização do plano de fundo",
+      "EyeX": -17.0,
+      "EyeY": 24.0,
+      "EyeZ": 50.0,
+      "LookX": 12.0,
+      "LookY": -13.0,
+      "LookZ": -58.0,
+      "UpX": 0.0,
+      "UpY": 1.0,
+      "UpZ": 0.0
+    },
+    "ConnectorPins": [],
+    "NodeViews": [
+      {
+        "Name": "Python Script",
+        "ShowGeometry": true,
+        "Id": "60bd46e3f919466c9129bbf423ce2bbb",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": true,
+        "Excluded": false,
+        "X": 244.0,
+        "Y": 191.0
+      },
+      {
+        "Name": "Document.Current",
+        "ShowGeometry": true,
+        "Id": "840901127caf4b6bbef1dced534a6128",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": -179.83942885635207,
+        "Y": 159.52427954067775
+      }
+    ],
+    "Annotations": [],
+    "X": 70.458808664629373,
+    "Y": 102.11871266123154,
+    "Zoom": 0.80332159346259768
+  }
+}

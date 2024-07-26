@@ -1,5 +1,5 @@
 title:
-  en_us: Import CSV
-  pt_br: Importar CSV
-tooltip: Descrição do comando
+  en_us: Create Panels
+  pt_br: Criar Painéis
+tooltip: Cria painéis baseado na tabela selecionada após acionar este comando.
 hyperlink: "https://github.com/tiagolimar/revit"

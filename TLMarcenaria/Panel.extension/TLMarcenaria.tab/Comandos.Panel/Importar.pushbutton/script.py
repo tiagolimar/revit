@@ -2,23 +2,22 @@
 
 import csv
 import codecs
-from pyrevit import DB, revit, forms
+from pyrevit import revit, forms
 from export_csv import export_from_table
 from family_manager import find_family_and_type, create_family_instances
-
-familyName = 'Painel'
-typeName = 'Painel'
+from table import codify
 
 doc = revit.doc
+family_name = 'Painel'
 PES = 30.48
-
 
 def main():
     locations = []
     parameters = []
     x_offset = 0
 
-    csv_file_path = export_from_table()
+    [view, csv_file_path] = export_from_table()
+    # codify(view)
 
     if csv_file_path:
         with codecs.open(csv_file_path, mode='r') as file:
@@ -35,10 +34,13 @@ def main():
                 for _ in range(quantidade):
                     locations.append((x_offset, 0))
                     parameters.append(
-                        {'comprimento': comprimento, 'largura': largura, 'espessura': espessura, 'cod': cod})
+                        {'comprimento': comprimento,
+                         'largura': largura,
+                         'espessura': espessura,
+                         'cod': cod})
                     x_offset += comprimento / PES  # Convertendo para pés
 
-        fam_symbol = find_family_and_type(doc, familyName)
+        fam_symbol = find_family_and_type(doc, family_name)
 
         if fam_symbol:
             create_family_instances(doc, fam_symbol, locations, parameters)

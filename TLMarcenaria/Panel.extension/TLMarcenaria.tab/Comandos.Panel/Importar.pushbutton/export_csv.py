@@ -29,7 +29,7 @@ def export_from_table():
         sched.Export(basefolder, fname, vseop)
         op.join(basefolder, fname)
         
-        return basefolder + '\\' + fname
+        return [sched, basefolder + '\\' + fname]
     
     except Exception as error:
         forms.alert('{}'.format(error))
